@@ -1,11 +1,13 @@
 SELECT
-    l_receiptdate,
-    count(l_receiptdate)
+    strftime('%Y-%m', l_receiptdate),
+    count(*)
 FROM
     lineitem,
+    orders,
     customer
 WHERE
-    c_custkey = '000000010' AND
-    l_receiptdate LIKE '1993-%'
-GROUP BY
-    l_receiptdate;
+    l_orderkey = o_orderkey
+    and o_custkey = c_custkey
+    and c_custkey = '000000010'
+    and l_receiptdate between '1993-01-01' and '1994-01'
+GROUP BY strftime('%Y-%m', l_receiptdate);
