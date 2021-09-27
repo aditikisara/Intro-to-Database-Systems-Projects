@@ -4,4 +4,4 @@ SELECT
     MAX(c_acctbal),
     SUM(c_acctbal)
 FROM customer
-group by c_mktsegment;
+GROUP BY c_mktsegment;
