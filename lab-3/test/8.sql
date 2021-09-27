@@ -2,7 +2,12 @@ SELECT
     s_name,
     s_acctbal
 FROM
-    supplier, nation
+    region,
+    nation,
+    supplier
 WHERE
-    n_nationkey = 'UNITED STATES' AND
-    s_acctbal > 5000;
+    s_nationkey = n_nationkey
+    AND n_regionkey = r_regionkey
+    AND s_acctbal > '5000'
+    AND r_name = 'AMERICA'
+ORDER BY s_name asc;
