@@ -37,19 +37,12 @@ def createPriceRange(_conn):
     print("Create PriceRange")
 
     try:
-        #This will drop the PriceRange table when the program runs (this function is called first in the main function)
-        sql = """
-            DROP VIEW PriceRange
-        """
-        _conn.execute(sql)
-        _conn.commit()
-        
         #Beginning of query
         sql = """
             CREATE VIEW PriceRange (maker, type, minPrice, maxPrice) AS
                 -- min and max for pc
                 SELECT
-                    PC.price,
+                    P.maker,
                     P.type,
                     min(price),
                     max(price)
@@ -64,7 +57,7 @@ def createPriceRange(_conn):
                 
                 -- min and max for printer
                 SELECT
-                    Pr.price,
+                    P.maker,
                     P.type,
                     min(price),
                     max(price)
@@ -79,7 +72,7 @@ def createPriceRange(_conn):
 
                 -- min and max for laptop
                 SELECT
-                    L.price,
+                    P.maker,
                     P.type,
                     min(price),
                     max(price)
@@ -107,6 +100,7 @@ def printPriceRange(_conn):
     print("Print PriceRange")
 
     try:
+        cur = _conn.cursor()
         sql = """
             SELECT *
             FROM PriceRange
@@ -114,18 +108,16 @@ def printPriceRange(_conn):
             -- already ordered by maker and type from CREATE VIEW
         """
 
-        _conn.execute(sql)
-        _conn.commit()
+        cur.execute(sql)
 
         l = '{:<10} {:<20} {:>20} {:>20}'
-        l.format("maker", "product", "minPrice", "maxPrice")
-
-        tuples = _conn.cursor().fetchall()
-        for i in tuples:
-            m = "{:<10} {:<20} {:>20} {:>20}"
-            m.format(i[0], i[1], i[2], i[3]) + '\n'
+        print(l.format("maker", "product", "minPrice", "maxPrice"))
         
-        print("success")
+        tuples = cur.fetchall()
+        for i in tuples:
+            something = "{:<10} {:<20} {:>20} {:>20}"
+            m = something.format(i[0], i[1], i[2], i[3])
+            print(m)
 
     except Error as e:
         _conn.rollback()
@@ -196,7 +188,6 @@ def deleteLaptop(_conn, _model):
 
     print("++++++++++++++++++++++++++++++++++")
 
-
 def main():
     database = r"data.sqlite"
 
@@ -222,6 +213,8 @@ def main():
             printPriceRange(conn)
 
         file.close()
+
+        conn.execute("DROP VIEW PriceRange")
 
     closeConnection(conn, database)
 
