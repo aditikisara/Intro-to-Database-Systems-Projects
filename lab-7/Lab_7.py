@@ -139,6 +139,8 @@ def Q1(_conn):
     print("Q1")
 
     try:
+        out = open('output/1.out', 'w')
+
         cur = _conn.cursor()
         sql = """
             SELECT *
@@ -147,12 +149,15 @@ def Q1(_conn):
         cur.execute(sql)
         rows = cur.fetchall()
 
-        lines = "{:>3} {:>0} {:>45} {:>10} {:>10}"
-        print(lines.format("wId", "wName", "wCap", "sId", "nId"))
+        lines = "{:>10} {:>0} {:>45} {:>10} {:>10}"
+        out.write((lines.format("wId", "wName", "wCap", "sId", "nId")) + '\n')
 
         for i in rows:
-            m = "{0:3} {1:40} {2:10} {3:10} {4:10}"
-            print(m.format(i[0], i[1], i[2], i[3], i[4]))
+            m = "{0:10} {1:40} {2:10} {3:10} {4:10}"
+            out.write((m.format(i[0], i[1], i[2], i[3], i[4])) + '\n')
+        
+        out.close()
+        print("success")
 
     except Error as e:
         _conn.rollback()
@@ -166,6 +171,8 @@ def Q2(_conn):
     print("Q2")
 
     try:
+        out = open('output/2.out', 'w')
+
         cur = _conn.cursor()
         sql = """
             SELECT
@@ -184,12 +191,15 @@ def Q2(_conn):
         cur.execute(sql)
         rows = cur.fetchall()
 
-        lines = "{0:21} {1:8} {2:10}"
-        print(lines.format("nation", "numW", "totCap"))
+        lines = "{0:46} {1:8} {2:10}"
+        out.write((lines.format("nation", "numW", "totCap") + '\n'))
 
         for i in rows:
-            m = "{0:20} {1:5} {2:10}"
-            print(m.format(i[0], i[1], i[2]))
+            m = "{0:45} {1:5} {2:10}"
+            out.write((m.format(i[0], i[1], i[2])) + '\n')
+        
+        out.close()
+        print("success")
 
     except Error as e:
         _conn.rollback()
@@ -203,9 +213,12 @@ def Q3(_conn):
     print("Q3")
 
     try:
-        with open ("input/3.in", "r") as f:
-            input = f.readline().strip()
+        inp = open('input/3.in', 'r')
+        input = inp.readline().strip()
+        inp.close()
         
+        out = open('output/3.out', 'w')
+
         cur = _conn.cursor()
 
         cur.execute(f"""
@@ -228,12 +241,15 @@ def Q3(_conn):
         """)
 
         l = "{0:20} {1:20} {2:15}"
-        print(l.format("supplier", "nation", "warehouse"))
+        out.write(l.format("supplier", "nation", "warehouse") + '\n')
 
         lines = cur.fetchall()
         for i in lines:
             m = "{0:20} {1:20} {2:15}"
-            print(m.format(i[0], i[1], i[2]))
+            out.write(m.format(i[0], i[1], i[2]) + '\n')
+        
+        out.close()
+        print("success")
         
     except Error as e:
         _conn.rollback()
@@ -247,9 +263,12 @@ def Q4(_conn):
     print("Q4")
 
     try:
-        with open ("input/4.in", "r") as f:
-            region = f.readline().strip()
-            threshold = f.readline().strip()
+        f = open('input/4.in', 'r')
+        region = f.readline().strip()
+        threshold = f.readline().strip()
+        f.close()
+
+        out = open('output/4.out', 'w')
         
         cur = _conn.cursor()
         cur.execute(f"""
@@ -269,13 +288,17 @@ def Q4(_conn):
                     ORDER BY w_capacity DESC
                     """)
         
-        l = "{0:36} {1:10}"
-        print(l.format("warehouse", "capacity"))
+        l = "{0:42} {1:10}"
+        out.write(l.format("warehouse", "capacity") + '\n')
 
         tuples = cur.fetchall()
         for i in tuples:
-            m = "{0:30} {1:10}"
-            print(m.format(i[0], i[1]))
+            m = "{0:40} {1:10}"
+            out.write(m.format(i[0], i[1]) + '\n')
+        
+        out.close()
+        print("success")
+
     except Error as e:
         _conn.rollback()
         print(e)
@@ -288,20 +311,58 @@ def Q5(_conn):
     print("Q5")
 
     try:
-        with open ("input/4.in", "r") as f:
-            region = f.readline().strip()
+        inp = open('input/5.in', 'r')
+        nation = inp.readline().strip()
+        inp.close()
+
+        out = open('output/5.out', 'w')
         
         cur = _conn.cursor()
         cur.execute(f"""
+                    SELECT
+                        r_name,
+                        SUM(w_capacity) as cap
+                    FROM
+                        region,
+                        nation,
+                        warehouse
+                    WHERE
+                        w_nationkey = n_nationkey and
+                        n_regionkey = r_regionkey and
+                        n_name = '{nation}'
+                    GROUP BY r_regionkey, r_name
+                    ORDER BY r_name ASC
                     """)
-        
-        temp1 = "{0:10} {1:10}"
-        print(temp1.format("region", "capacity"))
+        """
+        select r_name, ifnull(capacity, 0)
+        from
+            (
+                select r_name, sum(w_capacity) as cap
+                from region left outer join (
+                    select wn.nregionkey as w_regionkey, w_capacity 
+                    from warehouse, suppleir, nation sn, nation wn
+                    where
+                        w_suppkey = s_suppkey and
+                        s_naitonkey = sn.n_nationkey and
+                        sn.n_name = 'US' and
+                        w_nationkey = wn.n_naitonkey
+                on r_regionkey = w_regionkey
+                group by r_name)
+            order by r_name asc;
+            )
+        """
 
-        rows = cur.fetchall()
-        for row in rows:
-            temp2 = "{0:10} {1:10}"
-            print(temp2.format(row[0], row[1]))
+        
+        l = "{0:10} {1:10}"
+        out.write(l.format("region", "capacity") + '\n')
+
+        tuples = cur.fetchall()
+        for i in tuples:
+            temp = "{0:10} {1:10}"
+            out.write(temp.format(i[0], i[1]) + '\n')
+        
+        out.close()
+        print("success")
 
     except Error as e:
         _conn.rollback()
