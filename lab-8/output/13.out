@@ -1,0 +1,5 @@
+QUERY PLAN
+|--SCAN customer
+|--SEARCH region USING AUTOMATIC PARTIAL COVERING INDEX (r_name=?)
+`--SEARCH nation USING AUTOMATIC COVERING INDEX (n_regionkey=? AND n_nationkey=?)
+172603.51

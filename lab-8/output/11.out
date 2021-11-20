@@ -1,0 +1,5 @@
+QUERY PLAN
+|--USE TEMP B-TREE FOR count(DISTINCT)
+|--SCAN lineitem
+`--SEARCH orders USING AUTOMATIC COVERING INDEX (o_orderkey=?)
+975

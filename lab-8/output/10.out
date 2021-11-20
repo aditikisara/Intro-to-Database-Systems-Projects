@@ -1,0 +1,6 @@
+QUERY PLAN
+|--SCAN region
+|--SEARCH nation USING AUTOMATIC COVERING INDEX (n_regionkey=?)
+|--SEARCH customer USING AUTOMATIC COVERING INDEX (c_nationkey=?)
+`--SEARCH orders USING AUTOMATIC COVERING INDEX (o_custkey=?)
+66322068.56

@@ -1,0 +1,10 @@
+QUERY PLAN
+|--SEARCH customer USING INDEX customer_idx_c_name (c_name=?)
+|--SEARCH orders USING AUTOMATIC COVERING INDEX (o_custkey=?)
+|--SEARCH lineitem USING AUTOMATIC COVERING INDEX (l_orderkey=?)
+`--USE TEMP B-TREE FOR GROUP BY
+1993-01|3
+1993-02|4
+1993-03|3
+1993-06|1
+1993-11|1

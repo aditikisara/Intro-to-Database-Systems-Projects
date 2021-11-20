@@ -1,0 +1,5 @@
+QUERY PLAN
+|--SCAN orders
+|--SEARCH customer USING AUTOMATIC COVERING INDEX (c_custkey=?)
+`--SEARCH nation USING AUTOMATIC PARTIAL COVERING INDEX (n_name=? AND n_nationkey=?)
+86
